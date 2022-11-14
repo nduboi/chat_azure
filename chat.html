@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,500&display=swap" rel="stylesheet">
+</head>
+<body class="h-screen w-screen dark:bg-slate-800">
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        function $_GET(param) {
+            var vars = {};
+            window.location.href.replace( location.hash, '' ).replace( 
+                /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                function( m, key, value ) { // callback
+                    vars[key] = value !== undefined ? value : '';
+                }
+            );
+
+            if ( param ) {
+                return vars[param] ? vars[param] : null;	
+            }
+            return vars;
+        }
+        var name = $_GET('name');        
+        var socket = io();
+        var send = function() {
+            var text = "- "+document.getElementById('m').value + " (" +name + ") ";
+            socket.emit('chat message', text);
+            text = '';
+        }
+        if (name == 'null') {
+            window.location.href = "https://google.fr";
+        }else{
+            socket.emit('Joueur conecter', name);
+        }
+        var receive= function(msg, name) {
+            var li = document.createElement('li');
+            li.innerText = msg;
+            document.getElementById('messages_li').appendChild(li);
+            
+        }
+        
+        socket.on('chat message', receive);
+
+    </script>
+    <h1 class="h-1/6 flex justify-center items-center text-white " id="chatfont">Chat</h1>
+    <div class=" flex w-full  ">
+        <input  id="m" class="w-3/4 m-1 border-orange-300 text-2xl rounded-xl border-2">
+        <button onclick="send()" class="w-1/4 m-1 border-orange-300 border-2 rounded-xl bg-white">Envoyer</button>
+    </div>
+    <div class="relative">
+        <div class="">
+            <ul id="messages_li" class="p-5 list-inside list-none text-white">
+            </ul>
+        </div>
+        
+    </div>
+    
+    
+    <style>
+        #chatfont{
+            font-family: 'Pacifico', cursive;
+        }
+        #messages_li{
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
+</body>
+</html>
